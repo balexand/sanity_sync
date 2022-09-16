@@ -30,6 +30,7 @@ defmodule SanitySync.MixProject do
       {:ecto_sql, "~> 3.0"},
       {:jason, "~> 1.4"},
       {:postgrex, ">= 0.0.0"},
+      {:sanity, "~> 0.11.0"},
       {:unsafe_atomize_keys, "~> 1.1"},
 
       # Dev/test

@@ -27,6 +27,14 @@ defmodule SanitySyncTest do
     # FIXME
   end
 
+  test "sync_all invalid options" do
+    assert_raise ArgumentError,
+                 ~R{^unknown keys \[:a\] in \[a: "b"\], the allowed keys are: \[},
+                 fn ->
+                   SanitySync.sync_all(a: "b")
+                 end
+  end
+
   test "upsert_sanity_doc!" do
     # Insert
     assert %SanitySync.Doc{id: "6d30d4be-e90d-4738-80b2-0d57873cf4fc"} =

@@ -6,6 +6,8 @@ defmodule SanitySync do
   alias SanitySync.Doc
   import UnsafeAtomizeKeys
 
+  @upsert_opts_keys []
+
   defp repo, do: Application.fetch_env!(:sanity_sync, :repo)
 
   @doc """
@@ -24,8 +26,18 @@ defmodule SanitySync do
 
   All other options will be passed to `upsert_sanity_doc!/2`.
   """
-  def sync_all(_opts \\ []) do
-    # FIXME
+  def sync_all(opts) do
+    opts = Keyword.validate!(opts, [:sanity_config, :types] ++ @upsert_opts_keys)
+
+    """
+    *[_type in $types && !(_id in path("drafts.**"))]
+    """
+    |> Sanity.query(%{types: Keyword.fetch!(opts, :types)})
+    |> Sanity.request!(Keyword.fetch!(opts, :sanity_config))
+    |> Sanity.result!()
+    |> Enum.map(&unsafe_atomize_keys/1)
+
+    # FIXME paginate
     # FIXME types
   end
 
@@ -36,7 +48,10 @@ defmodule SanitySync do
 
     * `transaction_callback` - Callback function to be called in same transaction as upsert.
   """
-  def upsert_sanity_doc!(%{_id: id, _type: type} = doc, _opts \\ []) do
+  def upsert_sanity_doc!(%{_id: id, _type: type} = doc, opts \\ []) do
+    # FIXME _opts
+    _opts = Keyword.validate!(opts, @upsert_opts_keys)
+
     Doc.changeset(%Doc{}, %{doc: doc, id: id, type: type})
     |> repo().insert!(conflict_target: :id, on_conflict: :replace_all)
 
