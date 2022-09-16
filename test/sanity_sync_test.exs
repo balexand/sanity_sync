@@ -1,5 +1,5 @@
 defmodule SanitySyncTest do
-  use ExUnit.Case
+  use SanitySync.DataCase, async: true
   doctest SanitySync
 
   test "greets the world" do
