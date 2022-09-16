@@ -27,7 +27,9 @@ defmodule SanitySync.MixProject do
   defp deps do
     [
       {:ecto_sql, "~> 3.0"},
+      {:jason, "~> 1.4"},
       {:postgrex, ">= 0.0.0"},
+      {:unsafe_atomize_keys, "~> 1.1"},
 
       # Dev/test
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},

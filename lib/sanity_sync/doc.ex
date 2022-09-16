@@ -8,8 +8,6 @@ defmodule SanitySync.Doc do
     field :doc, :map
     field :type, :string
 
-    # FIXME published_at
-
     timestamps()
   end
 
