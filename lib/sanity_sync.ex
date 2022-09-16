@@ -1,18 +1,9 @@
 defmodule SanitySync do
   @moduledoc """
-  Documentation for `SanitySync`.
+  TODO
   """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> SanitySync.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def upsert_sanity_document() do
+    # FIXME
   end
 end
