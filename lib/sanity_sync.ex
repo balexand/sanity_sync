@@ -27,7 +27,8 @@ defmodule SanitySync do
   All other options will be passed to `upsert_sanity_doc!/2`.
   """
   def sync_all(opts) do
-    opts = Keyword.validate!(opts, [:sanity_config, :types] ++ @upsert_opts_keys)
+    {upsert_opts, opts} = Keyword.split(opts, @upsert_opts_keys)
+    opts = Keyword.validate!(opts, [:sanity_config, :types])
 
     """
     *[_type in $types && !(_id in path("drafts.**"))]
@@ -36,6 +37,7 @@ defmodule SanitySync do
     |> Sanity.request!(Keyword.fetch!(opts, :sanity_config))
     |> Sanity.result!()
     |> Enum.map(&unsafe_atomize_keys/1)
+    |> Enum.each(&upsert_sanity_doc!(&1, upsert_opts))
 
     # FIXME paginate
     # FIXME types

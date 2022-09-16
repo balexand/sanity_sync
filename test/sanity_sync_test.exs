@@ -29,7 +29,7 @@ defmodule SanitySyncTest do
 
   test "sync_all invalid options" do
     assert_raise ArgumentError,
-                 ~R{^unknown keys \[:a\] in \[a: "b"\], the allowed keys are: \[},
+                 "unknown keys [:a] in [a: \"b\"], the allowed keys are: [:sanity_config, :types]",
                  fn ->
                    SanitySync.sync_all(a: "b")
                  end
