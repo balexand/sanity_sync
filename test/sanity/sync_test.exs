@@ -50,15 +50,4 @@ defmodule Sanity.SyncTest do
 
     assert Sanity.Sync.get_doc!("6d30d4be-e90d-4738-80b2-0d57873cf4fc").title == "new title"
   end
-
-  test "upsert_sanity_doc! with transaction_callback" do
-    transaction_callback = fn payload ->
-      assert payload == %{doc: @sanity_doc, repo: Sanity.Sync.Test.Repo}
-      Process.put(:transaction_callback_was_called, true)
-    end
-
-    Sanity.Sync.upsert_sanity_doc!(@sanity_doc, transaction_callback: transaction_callback)
-
-    assert Process.get(:transaction_callback_was_called) == true
-  end
 end
