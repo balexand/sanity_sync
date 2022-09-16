@@ -1,4 +1,4 @@
-defmodule SanitySync.Test.Repo.Migrations.CreateDocs do
+defmodule Sanity.Sync.Test.Repo.Migrations.CreateDocs do
   use Ecto.Migration
 
   def change do

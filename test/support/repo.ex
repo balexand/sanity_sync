@@ -1,4 +1,4 @@
-defmodule SanitySync.Test.Repo do
+defmodule Sanity.Sync.Test.Repo do
   use Ecto.Repo,
     otp_app: :sanity_sync,
     adapter: Ecto.Adapters.Postgres

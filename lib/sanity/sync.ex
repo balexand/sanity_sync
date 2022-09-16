@@ -1,9 +1,9 @@
-defmodule SanitySync do
+defmodule Sanity.Sync do
   @moduledoc """
   TODO
   """
 
-  alias SanitySync.Doc
+  alias Sanity.Sync.Doc
   import UnsafeAtomizeKeys
 
   @upsert_opts_keys [:transaction_callback]
