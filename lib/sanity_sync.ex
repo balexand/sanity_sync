@@ -6,7 +6,7 @@ defmodule SanitySync do
   alias SanitySync.Doc
   import UnsafeAtomizeKeys
 
-  @upsert_opts_keys []
+  @upsert_opts_keys [:transaction_callback]
 
   defp repo, do: Application.fetch_env!(:sanity_sync, :repo)
 
@@ -40,7 +40,6 @@ defmodule SanitySync do
     |> Enum.each(&upsert_sanity_doc!(&1, upsert_opts))
 
     # FIXME paginate
-    # FIXME types
   end
 
   @doc """
@@ -51,10 +50,17 @@ defmodule SanitySync do
     * `transaction_callback` - Callback function to be called in same transaction as upsert.
   """
   def upsert_sanity_doc!(%{_id: id, _type: type} = doc, opts \\ []) do
-    # FIXME _opts
-    _opts = Keyword.validate!(opts, @upsert_opts_keys)
+    opts = Keyword.validate!(opts, @upsert_opts_keys)
 
     Doc.changeset(%Doc{}, %{doc: doc, id: id, type: type})
+    |> Ecto.Changeset.prepare_changes(fn changeset ->
+      case Keyword.fetch(opts, :transaction_callback) do
+        {:ok, cb} -> cb.(%{doc: doc, repo: changeset.repo})
+        :error -> nil
+      end
+
+      changeset
+    end)
     |> repo().insert!(conflict_target: :id, on_conflict: :replace_all)
 
     # FIXME transaction_callback
