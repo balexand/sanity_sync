@@ -22,6 +22,7 @@ defmodule Sanity.Sync do
 
   ## Options
 
+    * `sanity_config` - Sanity configuration. See `Sanity.request/2`.
     * `types` - List of types to sync. If omitted, all types will be synced.
 
   All other options will be passed to `upsert_sanity_doc!/2`.
