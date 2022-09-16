@@ -1,19 +1,19 @@
-defmodule SanitySync.DataCase do
+defmodule Sanity.Sync.DataCase do
   use ExUnit.CaseTemplate
 
   using do
     quote do
-      alias SanitySync.Test.Repo
+      alias Sanity.Sync.Test.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import SanitySync.DataCase
+      import Sanity.Sync.DataCase
     end
   end
 
   setup tags do
-    SanitySync.DataCase.setup_sandbox(tags)
+    Sanity.Sync.DataCase.setup_sandbox(tags)
     :ok
   end
 
@@ -21,7 +21,7 @@ defmodule SanitySync.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(SanitySync.Test.Repo, shared: not tags[:async])
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Sanity.Sync.Test.Repo, shared: not tags[:async])
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end
 

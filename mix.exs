@@ -1,4 +1,4 @@
-defmodule SanitySync.MixProject do
+defmodule Sanity.Sync.MixProject do
   use Mix.Project
 
   def project do
@@ -20,7 +20,7 @@ defmodule SanitySync.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {SanitySync.Application, []}
+      mod: {Sanity.Sync.Application, []}
     ]
   end
 

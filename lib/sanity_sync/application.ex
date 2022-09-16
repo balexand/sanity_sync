@@ -1,4 +1,4 @@
-defmodule SanitySync.Application do
+defmodule Sanity.Sync.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -8,13 +8,13 @@ defmodule SanitySync.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: SanitySync.Worker.start_link(arg)
-      # {SanitySync.Worker, arg}
+      # Starts a worker by calling: Sanity.Sync.Worker.start_link(arg)
+      # {Sanity.Sync.Worker, arg}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: SanitySync.Supervisor]
+    opts = [strategy: :one_for_one, name: Sanity.Sync.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end

@@ -1,4 +1,4 @@
-defmodule SanitySync.Doc do
+defmodule Sanity.Sync.Doc do
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -1,6 +1,6 @@
 defmodule SanitySyncTest do
-  use SanitySync.DataCase, async: true
-  doctest SanitySync, import: true
+  use Sanity.Sync.DataCase, async: true
+  doctest Sanity.Sync, import: true
 
   @sanity_doc %{
     _createdAt: "2022-09-13T21:52:07Z",
@@ -13,14 +13,14 @@ defmodule SanitySyncTest do
   }
 
   test "get_doc!" do
-    assert %SanitySync.Doc{id: "6d30d4be-e90d-4738-80b2-0d57873cf4fc"} =
-             SanitySync.upsert_sanity_doc!(@sanity_doc)
+    assert %Sanity.Sync.Doc{id: "6d30d4be-e90d-4738-80b2-0d57873cf4fc"} =
+             Sanity.Sync.upsert_sanity_doc!(@sanity_doc)
 
-    assert SanitySync.get_doc!("6d30d4be-e90d-4738-80b2-0d57873cf4fc") == @sanity_doc
+    assert Sanity.Sync.get_doc!("6d30d4be-e90d-4738-80b2-0d57873cf4fc") == @sanity_doc
   end
 
   test "get_doc! not found" do
-    assert_raise Ecto.NoResultsError, fn -> SanitySync.get_doc!("abd-def") end
+    assert_raise Ecto.NoResultsError, fn -> Sanity.Sync.get_doc!("abd-def") end
   end
 
   test "sync_all" do
@@ -31,33 +31,33 @@ defmodule SanitySyncTest do
     assert_raise ArgumentError,
                  "unknown keys [:a] in [a: \"b\"], the allowed keys are: [:sanity_config, :types]",
                  fn ->
-                   SanitySync.sync_all(a: "b")
+                   Sanity.Sync.sync_all(a: "b")
                  end
   end
 
   test "upsert_sanity_doc!" do
     # Insert
-    assert %SanitySync.Doc{id: "6d30d4be-e90d-4738-80b2-0d57873cf4fc"} =
-             SanitySync.upsert_sanity_doc!(@sanity_doc)
+    assert %Sanity.Sync.Doc{id: "6d30d4be-e90d-4738-80b2-0d57873cf4fc"} =
+             Sanity.Sync.upsert_sanity_doc!(@sanity_doc)
 
-    assert SanitySync.get_doc!("6d30d4be-e90d-4738-80b2-0d57873cf4fc").title == "Test Page"
+    assert Sanity.Sync.get_doc!("6d30d4be-e90d-4738-80b2-0d57873cf4fc").title == "Test Page"
 
     # Update
     new_doc = %{@sanity_doc | title: "new title"}
 
-    assert %SanitySync.Doc{id: "6d30d4be-e90d-4738-80b2-0d57873cf4fc"} =
-             SanitySync.upsert_sanity_doc!(new_doc)
+    assert %Sanity.Sync.Doc{id: "6d30d4be-e90d-4738-80b2-0d57873cf4fc"} =
+             Sanity.Sync.upsert_sanity_doc!(new_doc)
 
-    assert SanitySync.get_doc!("6d30d4be-e90d-4738-80b2-0d57873cf4fc").title == "new title"
+    assert Sanity.Sync.get_doc!("6d30d4be-e90d-4738-80b2-0d57873cf4fc").title == "new title"
   end
 
   test "upsert_sanity_doc! with transaction_callback" do
     transaction_callback = fn payload ->
-      assert payload == %{doc: @sanity_doc, repo: SanitySync.Test.Repo}
+      assert payload == %{doc: @sanity_doc, repo: Sanity.Sync.Test.Repo}
       Process.put(:transaction_callback_was_called, true)
     end
 
-    SanitySync.upsert_sanity_doc!(@sanity_doc, transaction_callback: transaction_callback)
+    Sanity.Sync.upsert_sanity_doc!(@sanity_doc, transaction_callback: transaction_callback)
 
     assert Process.get(:transaction_callback_was_called) == true
   end
