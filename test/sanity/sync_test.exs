@@ -1,4 +1,4 @@
-defmodule SanitySyncTest do
+defmodule Sanity.SyncTest do
   use Sanity.Sync.DataCase, async: true
   doctest Sanity.Sync, import: true
 
