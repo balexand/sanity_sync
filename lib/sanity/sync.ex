@@ -27,7 +27,7 @@ defmodule Sanity.Sync do
   All other options will be passed to `upsert_sanity_doc!/2`.
   """
   def sync_all(opts) do
-    opts = Keyword.validate!(opts, [:sanity_config, :types])
+    opts = Keyword.validate!(opts, [:callback, :sanity_config, :types])
 
     """
     *[_type in $types && !(_id in path("drafts.**"))]
