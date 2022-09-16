@@ -62,7 +62,5 @@ defmodule SanitySync do
       changeset
     end)
     |> repo().insert!(conflict_target: :id, on_conflict: :replace_all)
-
-    # FIXME transaction_callback
   end
 end
