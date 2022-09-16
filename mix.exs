@@ -8,6 +8,7 @@ defmodule SanitySync.MixProject do
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -36,5 +37,9 @@ defmodule SanitySync.MixProject do
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:mox, "~> 1.0", only: :test}
     ]
+  end
+
+  def aliases do
+    [test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]]
   end
 end
