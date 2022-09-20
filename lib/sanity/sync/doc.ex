@@ -1,4 +1,8 @@
 defmodule Sanity.Sync.Doc do
+  @moduledoc """
+  Ecto schema for a Sanity document.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 
