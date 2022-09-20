@@ -1,15 +1,27 @@
 defmodule Sanity.Sync.MixProject do
   use Mix.Project
 
+  @version "0.1.0"
+
   def project do
     [
       app: :sanity_sync,
-      version: "0.1.0",
+      description: "For syncing content from Sanity CMS to Ecto.",
+      version: @version,
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      package: [
+        licenses: ["MIT"],
+        links: %{"GitHub" => "https://github.com/balexand/sanity_sync"}
+      ],
+      docs: [
+        extras: ["README.md"],
+        source_ref: "v#{@version}",
+        source_url: "https://github.com/balexand/sanity_sync"
+      ]
     ]
   end
 
