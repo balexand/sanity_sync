@@ -1,4 +1,6 @@
 defmodule Sanity.Sync.Test.Repo.Migrations.CreateDocs do
+  # From https://github.com/balexand/sanity_sync
+
   use Ecto.Migration
 
   def change do
