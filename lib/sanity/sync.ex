@@ -1,6 +1,6 @@
 defmodule Sanity.Sync do
   @moduledoc """
-  TODO
+  For syncing content from Sanity CMS to Ecto.
   """
 
   import Ecto.Query
@@ -77,7 +77,7 @@ defmodule Sanity.Sync do
     |> Enum.map(&unsafe_atomize_keys/1)
     |> Enum.each(&upsert_sanity_doc!(&1, opts))
 
-    # FIXME paginate
+    # TODO paginate
   end
 
   @doc """
