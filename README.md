@@ -2,7 +2,7 @@
 
 [![Package](https://img.shields.io/hexpm/v/sanity_sync.svg)](https://hex.pm/packages/sanity_sync) [![Documentation](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/sanity_sync) ![CI](https://github.com/balexand/sanity_sync/actions/workflows/elixir.yml/badge.svg)
 
-For syncing content from Sanity CMS to Ecto.
+For syncing content from Sanity CMS to Ecto/PostgreSQL.
 
 ## Installation
 
@@ -17,3 +17,7 @@ end
 ```
 
 See the [docs](https://hexdocs.pm/sanity_sync/Sanity.Sync.html) for usage.
+
+## Migrations
+
+Copy the [migrations](https://github.com/balexand/sanity_sync/tree/main/priv/repo/migrations) from this project to your app.

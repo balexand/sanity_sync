@@ -6,7 +6,7 @@ defmodule Sanity.Sync.MixProject do
   def project do
     [
       app: :sanity_sync,
-      description: "For syncing content from Sanity CMS to Ecto.",
+      description: "For syncing content from Sanity CMS to Ecto/PostgreSQL.",
       version: @version,
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
