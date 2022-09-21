@@ -18,6 +18,14 @@ end
 
 See the [docs](https://hexdocs.pm/sanity_sync/Sanity.Sync.html) for usage.
 
+## Configuration
+
+Configure Ecto repo:
+
+```elixir
+config :sanity_sync, :repo, MyApp.Repo
+```
+
 ## Migrations
 
 Copy the [migrations](https://github.com/balexand/sanity_sync/tree/main/priv/repo/migrations) from this project to your app.
