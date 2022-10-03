@@ -50,7 +50,7 @@ defmodule Sanity.Sync do
     |> request!(Keyword.fetch!(opts, :sanity_config))
     |> Sanity.result!()
     |> case do
-      [doc] -> doc |> unsafe_atomize_keys() |> upsert_sanity_doc!(opts)
+      [doc] -> doc |> unsafe_atomize_keys(&Inflex.underscore/1) |> upsert_sanity_doc!(opts)
       [] -> repo().delete_all(from d in Doc, where: d.id == ^id)
     end
   end
@@ -74,7 +74,7 @@ defmodule Sanity.Sync do
     |> Sanity.query(%{types: Keyword.fetch!(opts, :types)})
     |> request!(Keyword.fetch!(opts, :sanity_config))
     |> Sanity.result!()
-    |> Enum.map(&unsafe_atomize_keys/1)
+    |> Enum.map(fn doc -> unsafe_atomize_keys(doc, &Inflex.underscore/1) end)
     |> Enum.each(&upsert_sanity_doc!(&1, opts))
 
     # TODO paginate
