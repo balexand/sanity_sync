@@ -40,6 +40,7 @@ defmodule Sanity.Sync.MixProject do
   defp deps do
     [
       {:ecto_sql, "~> 3.0"},
+      {:inflex, "~> 2.1"},
       {:jason, "~> 1.4"},
       {:postgrex, ">= 0.0.0"},
       {:sanity, "~> 0.11.0"},
