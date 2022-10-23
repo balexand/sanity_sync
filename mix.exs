@@ -43,7 +43,7 @@ defmodule Sanity.Sync.MixProject do
       {:inflex, "~> 2.1"},
       {:jason, "~> 1.4"},
       {:postgrex, ">= 0.0.0"},
-      {:sanity, "~> 0.11.0"},
+      {:sanity, "~> 0.11"},
       {:unsafe_atomize_keys, "~> 1.1"},
 
       # Dev/test
