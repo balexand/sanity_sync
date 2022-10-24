@@ -94,7 +94,8 @@ defmodule Sanity.Sync do
     end)
   end
 
-  defp stream(opts) do
+  defp sanity_client(opts) do
+    Application.get_env(:sanity_sync, :sanity_client, Sanity)
   end
 
   # FIXME delete
