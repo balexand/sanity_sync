@@ -58,12 +58,13 @@ defmodule Sanity.Sync do
   def sync(id, opts) when is_binary(id) do
     opts = NimbleOptions.validate!(opts, @sync_opts_schema)
 
-    """
-    *[_id == $id]
-    """
-    |> Sanity.query(%{id: id})
-    |> request!(Keyword.fetch!(opts, :request_opts))
-    |> Sanity.result!()
+    stream(
+      batch_size: 1,
+      query: "_id == $id",
+      request_opts: Keyword.fetch(opts, :request_opts),
+      variables: %{id: id}
+    )
+    |> Enum.take(1)
     |> case do
       [doc] ->
         doc
@@ -95,16 +96,13 @@ defmodule Sanity.Sync do
   def sync_all(opts) do
     opts = NimbleOptions.validate!(opts, @sync_all_opts_schema)
 
-    """
-    *[_type in $types && !(_id in path("drafts.**"))]
-    """
-    |> Sanity.query(%{types: Keyword.fetch!(opts, :types)})
-    |> request!(Keyword.fetch!(opts, :request_opts))
-    |> Sanity.result!()
-    |> Enum.map(fn doc -> unsafe_atomize_keys(doc, &Inflex.underscore/1) end)
-    |> Enum.each(&upsert_sanity_doc!(&1, Keyword.take(opts, [:callback])))
-
-    # TODO paginate
+    stream(
+      query: "_type in $types",
+      variables: %{types: Keyword.fetch!(opts, :types)},
+      request_opts: Keyword.fetch!(opts, :request_opts)
+    )
+    |> Stream.each(&upsert_sanity_doc!(&1, Keyword.take(opts, [:callback])))
+    |> Stream.run()
   end
 
   @upsert_sanity_doc_opts_schema [@callback_opt_schema]
@@ -129,12 +127,8 @@ defmodule Sanity.Sync do
     end)
   end
 
-  # defp sanity_client(opts) do
-  #   Application.get_env(:sanity_sync, :sanity_client, Sanity)
-  # end
-
-  # FIXME delete
-  defp request!(request, config) do
-    Application.get_env(:sanity_sync, :sanity_client, Sanity).request!(request, config)
+  defp stream(opts) do
+    Application.get_env(:sanity_sync, :sanity_client, Sanity).stream(opts)
+    |> Stream.map(fn doc -> unsafe_atomize_keys(doc, &Inflex.underscore/1) end)
   end
 end
