@@ -38,16 +38,16 @@ defmodule Sanity.Sync do
     * `callback` - Callback function that will be called after the document is upserted. It will
       be passed a map like `%{doc: doc, repo: repo}`. This callback is not called when the record
       is deleted.
-    * `sanity_config` - Sanity configuration. See `Sanity.request/2`.
+    * `request_opts` - Sanity configuration. See `Sanity.request/2`.
   """
   def sync(id, opts) when is_binary(id) do
-    opts = Keyword.validate!(opts, [:callback, :sanity_config])
+    opts = Keyword.validate!(opts, [:callback, :request_opts])
 
     """
     *[_id == $id]
     """
     |> Sanity.query(%{id: id})
-    |> request!(Keyword.fetch!(opts, :sanity_config))
+    |> request!(Keyword.fetch!(opts, :request_opts))
     |> Sanity.result!()
     |> case do
       [doc] -> doc |> unsafe_atomize_keys(&Inflex.underscore/1) |> upsert_sanity_doc!(opts)
@@ -62,17 +62,17 @@ defmodule Sanity.Sync do
 
     * `callback` - Callback function that will be called after each document is upserted. It will
       be passed a map like `%{doc: doc, repo: repo}`.
-    * `sanity_config` - Sanity configuration. See `Sanity.request/2`.
+    * `request_opts` - Sanity configuration. See `Sanity.request/2`.
     * `types` - List of types to sync. If omitted, all types will be synced.
   """
   def sync_all(opts) do
-    opts = Keyword.validate!(opts, [:callback, :sanity_config, :types])
+    opts = Keyword.validate!(opts, [:callback, :request_opts, :types])
 
     """
     *[_type in $types && !(_id in path("drafts.**"))]
     """
     |> Sanity.query(%{types: Keyword.fetch!(opts, :types)})
-    |> request!(Keyword.fetch!(opts, :sanity_config))
+    |> request!(Keyword.fetch!(opts, :request_opts))
     |> Sanity.result!()
     |> Enum.map(fn doc -> unsafe_atomize_keys(doc, &Inflex.underscore/1) end)
     |> Enum.each(&upsert_sanity_doc!(&1, opts))
@@ -94,6 +94,10 @@ defmodule Sanity.Sync do
     end)
   end
 
+  defp stream(opts) do
+  end
+
+  # FIXME delete
   defp request!(request, config) do
     Application.get_env(:sanity_sync, :sanity_client, Sanity).request!(request, config)
   end

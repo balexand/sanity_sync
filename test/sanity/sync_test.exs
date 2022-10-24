@@ -49,7 +49,7 @@ defmodule Sanity.SyncTest do
 
     Mox.expect(MockCallback, :callback, fn %{doc: @sanity_doc, repo: _} -> nil end)
 
-    Sanity.Sync.sync(@id, callback: &MockCallback.callback/1, sanity_config: [project_id: "a"])
+    Sanity.Sync.sync(@id, callback: &MockCallback.callback/1, request_opts: [project_id: "a"])
 
     assert @sanity_doc == Sanity.Sync.get_doc(@id)
 
@@ -58,7 +58,7 @@ defmodule Sanity.SyncTest do
       %Sanity.Response{body: %{"result" => []}}
     end)
 
-    Sanity.Sync.sync(@id, callback: &MockCallback.callback/1, sanity_config: [project_id: "a"])
+    Sanity.Sync.sync(@id, callback: &MockCallback.callback/1, request_opts: [project_id: "a"])
 
     assert nil == Sanity.Sync.get_doc(@id)
   end
@@ -70,7 +70,7 @@ defmodule Sanity.SyncTest do
 
     assert nil == Sanity.Sync.get_doc(@id)
 
-    Sanity.Sync.sync_all(types: ["page", "product"], sanity_config: [project_id: "a"])
+    Sanity.Sync.sync_all(types: ["page", "product"], request_opts: [project_id: "a"])
 
     assert @sanity_doc == Sanity.Sync.get_doc(@id)
   end
@@ -85,7 +85,7 @@ defmodule Sanity.SyncTest do
     Sanity.Sync.sync_all(
       callback: &MockCallback.callback/1,
       types: ["page", "product"],
-      sanity_config: []
+      request_opts: []
     )
 
     assert @sanity_doc == Sanity.Sync.get_doc(@id)
@@ -93,7 +93,7 @@ defmodule Sanity.SyncTest do
 
   test "sync_all invalid options" do
     assert_raise ArgumentError,
-                 "unknown keys [:a] in [a: \"b\"], the allowed keys are: [:callback, :sanity_config, :types]",
+                 "unknown keys [:a] in [a: \"b\"], the allowed keys are: [:callback, :request_opts, :types]",
                  fn ->
                    Sanity.Sync.sync_all(a: "b")
                  end
