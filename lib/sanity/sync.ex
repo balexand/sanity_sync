@@ -1,6 +1,13 @@
 defmodule Sanity.Sync do
   @moduledoc """
   For syncing content from Sanity CMS to Ecto.
+
+  ## Suggested strategy for syncing
+
+  * Call `sync/2` when a webhook is called to immediately create, update, or delete the document.
+  * Use `sync_all/1` for the inital import of documents and to reconcile created/updates webhooks
+    that were missed.
+  * TODO `reconcile_deleted` to reconcile any deleted webhooks that were missed.
   """
 
   import Ecto.Query
