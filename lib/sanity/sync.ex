@@ -65,7 +65,7 @@ defmodule Sanity.Sync do
     stream(
       batch_size: 1,
       query: "_id == $id",
-      request_opts: Keyword.fetch(opts, :request_opts),
+      request_opts: opts[:request_opts],
       variables: %{id: id}
     )
     |> Enum.take(1)
@@ -102,8 +102,8 @@ defmodule Sanity.Sync do
 
     stream(
       query: "_type in $types",
-      variables: %{types: Keyword.fetch!(opts, :types)},
-      request_opts: Keyword.fetch!(opts, :request_opts)
+      variables: %{types: opts[:types]},
+      request_opts: opts[:request_opts]
     )
     |> Stream.each(&upsert_sanity_doc!(&1, Keyword.take(opts, [:callback])))
     |> Stream.run()
