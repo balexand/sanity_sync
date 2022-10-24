@@ -49,8 +49,6 @@ defmodule Sanity.Sync do
   be called. If the document doesn't exist, then the `Sanity.Sync.Doc` for that document will be
   deleted.
 
-  This function can be called when a webhook is received to sync a document.
-
   ## Options
 
   #{NimbleOptions.docs(@sync_opts_schema)}
