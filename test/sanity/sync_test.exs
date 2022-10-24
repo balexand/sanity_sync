@@ -43,60 +43,56 @@ defmodule Sanity.SyncTest do
   test "sync" do
     assert nil == Sanity.Sync.get_doc(@id)
 
-    Mox.expect(MockClient, :request!, fn %Sanity.Request{}, _ ->
-      %Sanity.Response{body: %{"result" => [@sanity_doc]}}
-    end)
-
+    Mox.expect(MockClient, :stream, fn _opts -> [@sanity_doc] end)
     Mox.expect(MockCallback, :callback, fn %{doc: @sanity_doc, repo: _} -> nil end)
 
-    Sanity.Sync.sync(@id, callback: &MockCallback.callback/1, sanity_config: [project_id: "a"])
+    Sanity.Sync.sync(@id, callback: &MockCallback.callback/1, request_opts: [project_id: "a"])
 
     assert @sanity_doc == Sanity.Sync.get_doc(@id)
 
     # deletes document
-    Mox.expect(MockClient, :request!, fn %Sanity.Request{}, _ ->
-      %Sanity.Response{body: %{"result" => []}}
-    end)
+    Mox.expect(MockClient, :stream, fn _opts -> [] end)
 
-    Sanity.Sync.sync(@id, callback: &MockCallback.callback/1, sanity_config: [project_id: "a"])
+    Sanity.Sync.sync(@id, callback: &MockCallback.callback/1, request_opts: [project_id: "a"])
 
     assert nil == Sanity.Sync.get_doc(@id)
   end
 
   test "sync_all" do
-    Mox.expect(MockClient, :request!, fn %Sanity.Request{}, [project_id: "a"] ->
-      %Sanity.Response{body: %{"result" => [@sanity_doc]}}
+    Mox.expect(MockClient, :stream, fn opts ->
+      assert opts == [
+               query: "_type in $types",
+               variables: %{types: ["page", "product"]},
+               request_opts: [project_id: "a"]
+             ]
+
+      [@sanity_doc]
     end)
 
     assert nil == Sanity.Sync.get_doc(@id)
 
-    Sanity.Sync.sync_all(types: ["page", "product"], sanity_config: [project_id: "a"])
+    Sanity.Sync.sync_all(types: ["page", "product"], request_opts: [project_id: "a"])
 
     assert @sanity_doc == Sanity.Sync.get_doc(@id)
   end
 
   test "sync_all with callback" do
-    Mox.expect(MockClient, :request!, fn _, _ ->
-      %Sanity.Response{body: %{"result" => [@sanity_doc]}}
-    end)
-
+    Mox.expect(MockClient, :stream, fn _opts -> [@sanity_doc] end)
     Mox.expect(MockCallback, :callback, fn %{doc: @sanity_doc, repo: _} -> nil end)
 
     Sanity.Sync.sync_all(
       callback: &MockCallback.callback/1,
       types: ["page", "product"],
-      sanity_config: []
+      request_opts: []
     )
 
     assert @sanity_doc == Sanity.Sync.get_doc(@id)
   end
 
   test "sync_all invalid options" do
-    assert_raise ArgumentError,
-                 "unknown keys [:a] in [a: \"b\"], the allowed keys are: [:callback, :sanity_config, :types]",
-                 fn ->
-                   Sanity.Sync.sync_all(a: "b")
-                 end
+    assert_raise NimbleOptions.ValidationError, ~R{unknown options \[:a\]}, fn ->
+      Sanity.Sync.sync_all(a: "b")
+    end
   end
 
   test "upsert_sanity_doc!" do

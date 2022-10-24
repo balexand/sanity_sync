@@ -1,8 +1,4 @@
-defmodule Sanity.Sync.MockBehaviour do
-  @callback request!(Sanity.Request.t(), keyword()) :: Sanity.Response.t()
-end
-
-Mox.defmock(Sanity.Sync.MockClient, for: Sanity.Sync.MockBehaviour)
+Mox.defmock(Sanity.Sync.MockClient, for: Sanity.Behaviour)
 
 defmodule Sanity.Sync.CallbackBehaviour do
   @callback callback(map()) :: any()
