@@ -7,6 +7,19 @@ defmodule Sanity.Sync do
   alias Sanity.Sync.Doc
   import UnsafeAtomizeKeys
 
+  @callback_opt_schema {
+    :callback,
+    # nimble_options doens't support function type
+    type: :any,
+    doc:
+      "Callback function that will be called after the document is upserted. It will be passed a map like `%{doc: doc, repo: repo}`. This callback is not called when the record is deleted."
+  }
+
+  @request_opts_opt_schema {
+    :request_opts,
+    type: :keyword_list, required: true, doc: "Options to be passed to `Sanity.request/2`."
+  }
+
   defp repo, do: Application.fetch_env!(:sanity_sync, :repo)
 
   @doc """
@@ -26,6 +39,11 @@ defmodule Sanity.Sync do
     repo().get!(Doc, id).doc |> unsafe_atomize_keys()
   end
 
+  @sync_opts_schema [
+    @callback_opt_schema,
+    @request_opts_opt_schema
+  ]
+
   @doc """
   Fetches a single document from Sanity. If the document exists then `upsert_sanity_doc!/2` will
   be called. If the document doesn't exist, then the `Sanity.Sync.Doc` for that document will be
@@ -35,13 +53,10 @@ defmodule Sanity.Sync do
 
   ## Options
 
-    * `callback` - Callback function that will be called after the document is upserted. It will
-      be passed a map like `%{doc: doc, repo: repo}`. This callback is not called when the record
-      is deleted.
-    * `request_opts` - Sanity configuration. See `Sanity.request/2`.
+  #{NimbleOptions.docs(@sync_opts_schema)}
   """
   def sync(id, opts) when is_binary(id) do
-    opts = Keyword.validate!(opts, [:callback, :request_opts])
+    opts = NimbleOptions.validate!(opts, @sync_opts_schema)
 
     """
     *[_id == $id]
@@ -50,23 +65,35 @@ defmodule Sanity.Sync do
     |> request!(Keyword.fetch!(opts, :request_opts))
     |> Sanity.result!()
     |> case do
-      [doc] -> doc |> unsafe_atomize_keys(&Inflex.underscore/1) |> upsert_sanity_doc!(opts)
-      [] -> repo().delete_all(from d in Doc, where: d.id == ^id)
+      [doc] ->
+        doc
+        |> unsafe_atomize_keys(&Inflex.underscore/1)
+        |> upsert_sanity_doc!(Keyword.take(opts, [:callback]))
+
+      [] ->
+        repo().delete_all(from d in Doc, where: d.id == ^id)
     end
   end
+
+  @sync_all_opts_schema [
+    @callback_opt_schema,
+    @request_opts_opt_schema,
+    types: [
+      type: {:list, :string},
+      required: true,
+      doc: "List of types to sync."
+    ]
+  ]
 
   @doc """
   Fetches all documents from Sanity and calls `upsert_sanity_doc!/2`.
 
   ## Options
 
-    * `callback` - Callback function that will be called after each document is upserted. It will
-      be passed a map like `%{doc: doc, repo: repo}`.
-    * `request_opts` - Sanity configuration. See `Sanity.request/2`.
-    * `types` - List of types to sync. If omitted, all types will be synced.
+  #{NimbleOptions.docs(@sync_all_opts_schema)}
   """
   def sync_all(opts) do
-    opts = Keyword.validate!(opts, [:callback, :request_opts, :types])
+    opts = NimbleOptions.validate!(opts, @sync_all_opts_schema)
 
     """
     *[_type in $types && !(_id in path("drafts.**"))]
@@ -75,15 +102,23 @@ defmodule Sanity.Sync do
     |> request!(Keyword.fetch!(opts, :request_opts))
     |> Sanity.result!()
     |> Enum.map(fn doc -> unsafe_atomize_keys(doc, &Inflex.underscore/1) end)
-    |> Enum.each(&upsert_sanity_doc!(&1, opts))
+    |> Enum.each(&upsert_sanity_doc!(&1, Keyword.take(opts, [:callback])))
 
     # TODO paginate
   end
 
+  @upsert_sanity_doc_opts_schema [@callback_opt_schema]
+
   @doc """
   Upserts a sanity document.
+
+  ## Options
+
+  #{NimbleOptions.docs(@upsert_sanity_doc_opts_schema)}
   """
   def upsert_sanity_doc!(%{_id: id, _type: type} = doc, opts \\ []) do
+    opts = NimbleOptions.validate!(opts, @upsert_sanity_doc_opts_schema)
+
     Doc.changeset(%Doc{}, %{doc: doc, id: id, type: type})
     |> repo().insert!(conflict_target: :id, on_conflict: :replace_all)
     |> tap(fn _ ->
@@ -94,9 +129,9 @@ defmodule Sanity.Sync do
     end)
   end
 
-  defp sanity_client(opts) do
-    Application.get_env(:sanity_sync, :sanity_client, Sanity)
-  end
+  # defp sanity_client(opts) do
+  #   Application.get_env(:sanity_sync, :sanity_client, Sanity)
+  # end
 
   # FIXME delete
   defp request!(request, config) do

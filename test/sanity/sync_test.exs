@@ -92,11 +92,9 @@ defmodule Sanity.SyncTest do
   end
 
   test "sync_all invalid options" do
-    assert_raise ArgumentError,
-                 "unknown keys [:a] in [a: \"b\"], the allowed keys are: [:callback, :request_opts, :types]",
-                 fn ->
-                   Sanity.Sync.sync_all(a: "b")
-                 end
+    assert_raise NimbleOptions.ValidationError, ~R{unknown options \[:a\]}, fn ->
+      Sanity.Sync.sync_all(a: "b")
+    end
   end
 
   test "upsert_sanity_doc!" do
