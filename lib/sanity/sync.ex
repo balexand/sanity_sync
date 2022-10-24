@@ -16,8 +16,7 @@ defmodule Sanity.Sync do
 
   @callback_opt_schema {
     :callback,
-    # nimble_options doens't support function type
-    type: :any,
+    type: {:fun, 1},
     doc:
       "Callback function that will be called after the document is upserted. It will be passed a map like `%{doc: doc, repo: repo}`. This callback is not called when the record is deleted."
   }
