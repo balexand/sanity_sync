@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2022-10-24
+
 ### Changed
 
 - Use `Sanity.stream/1` under the hood for efficient pagination of large datasets, automatic retry of failed requests, and cleaner code.
