@@ -7,7 +7,7 @@ defmodule Sanity.Sync do
   * Call `sync/2` when a webhook is called to immediately create, update, or delete the document.
   * Use `sync_all/1` for the inital import of documents and to reconcile created/updates webhooks
     that were missed.
-  * TODO `reconcile_deleted` to reconcile any deleted webhooks that were missed.
+  * Use `reconcile_deleted/1` to reconcile any deleted webhooks that were missed.
   """
 
   require Logger
@@ -56,7 +56,8 @@ defmodule Sanity.Sync do
   ]
 
   @doc """
-  FIXME
+  Deletes any `Sanity.Sync.Doc` records in Ecto that correspond with documents that no longer
+  exist in Sanity CMS.
 
   ## Options
 
