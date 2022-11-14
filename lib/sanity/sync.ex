@@ -10,6 +10,7 @@ defmodule Sanity.Sync do
   * TODO `reconcile_deleted` to reconcile any deleted webhooks that were missed.
   """
 
+  require Logger
   import Ecto.Query
   alias Sanity.Sync.Doc
   import UnsafeAtomizeKeys
@@ -67,10 +68,26 @@ defmodule Sanity.Sync do
 
     stream_ecto_ids(batch_size)
     |> Stream.chunk_every(batch_size)
-    |> Stream.each(fn _ids ->
-      nil
+    |> Enum.flat_map(fn ids ->
+      existing_ids =
+        Sanity.stream(
+          projection: "{ _id }",
+          query: "_id in $ids",
+          request_opts: opts[:request_opts],
+          variables: %{ids: ids}
+        )
+        |> Enum.map(&Map.fetch!(&1, "_id"))
+
+      ids -- existing_ids
     end)
-    |> Stream.run()
+    |> case do
+      [] ->
+        nil
+
+      ids ->
+        Logger.warn("deleting #{length(ids)} records: #{inspect(ids, limit: :infinity)}")
+        repo().delete_all(from d in Doc, where: d.id in ^ids)
+    end
   end
 
   # Returns a lazy stream of all `Sanity.Sync.Doc` ids in Ecto. Like `Ecto.Repo.stream` but
