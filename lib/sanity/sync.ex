@@ -141,9 +141,7 @@ defmodule Sanity.Sync do
     |> Enum.take(1)
     |> case do
       [doc] ->
-        doc
-        |> unsafe_atomize_keys(&Inflex.underscore/1)
-        |> upsert_sanity_doc!(Keyword.take(opts, [:callback]))
+        upsert_sanity_doc!(doc, Keyword.take(opts, [:callback]))
 
       [] ->
         repo().delete_all(from d in Doc, where: d.id == ^id)
