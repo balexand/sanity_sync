@@ -7,9 +7,10 @@ defmodule Sanity.Sync do
   * Call `sync/2` when a webhook is called to immediately create, update, or delete the document.
   * Use `sync_all/1` for the inital import of documents and to reconcile created/updates webhooks
     that were missed.
-  * TODO `reconcile_deleted` to reconcile any deleted webhooks that were missed.
+  * Use `reconcile_deleted/1` to reconcile any deleted webhooks that were missed.
   """
 
+  require Logger
   import Ecto.Query
   alias Sanity.Sync.Doc
   import UnsafeAtomizeKeys
@@ -43,6 +44,75 @@ defmodule Sanity.Sync do
   """
   def get_doc!(id) do
     repo().get!(Doc, id).doc |> unsafe_atomize_keys()
+  end
+
+  @reconcile_deleted_opts_schema [
+    @request_opts_opt_schema,
+    batch_size: [
+      type: :pos_integer,
+      default: 500,
+      doc: "Number of records to fetch per batch."
+    ]
+  ]
+
+  @doc """
+  Deletes any `Sanity.Sync.Doc` records in Ecto that correspond with documents that no longer
+  exist in Sanity CMS.
+
+  ## Options
+
+  #{NimbleOptions.docs(@reconcile_deleted_opts_schema)}
+  """
+  def reconcile_deleted(opts) do
+    opts = NimbleOptions.validate!(opts, @reconcile_deleted_opts_schema)
+    batch_size = opts[:batch_size]
+
+    stream_ecto_ids(batch_size)
+    |> Stream.chunk_every(batch_size)
+    |> Enum.flat_map(fn ids ->
+      existing_ids =
+        stream(
+          projection: "{ _id }",
+          query: "_id in $ids",
+          request_opts: opts[:request_opts],
+          variables: %{ids: ids}
+        )
+        |> Enum.map(& &1._id)
+
+      ids -- existing_ids
+    end)
+    |> case do
+      [] ->
+        nil
+
+      ids ->
+        Logger.warn("deleting #{length(ids)} records: #{inspect(ids, limit: :infinity)}")
+        repo().delete_all(from d in Doc, where: d.id in ^ids)
+    end
+  end
+
+  # Returns a lazy stream of all `Sanity.Sync.Doc` ids in Ecto. Like `Ecto.Repo.stream` but
+  # doesn't keep a transaction open while enumerating.
+  defp stream_ecto_ids(batch_size) do
+    query =
+      from d in Doc,
+        select: d.id,
+        order_by: d.id,
+        limit: ^batch_size
+
+    Stream.unfold(:first_page, fn
+      nil ->
+        nil
+
+      :first_page ->
+        ids = repo().all(query)
+        {ids, List.last(ids)}
+
+      last_id ->
+        ids = repo().all(from d in query, where: d.id > ^last_id)
+        {ids, List.last(ids)}
+    end)
+    |> Stream.flat_map(& &1)
   end
 
   @sync_opts_schema [
