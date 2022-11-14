@@ -70,13 +70,13 @@ defmodule Sanity.Sync do
     |> Stream.chunk_every(batch_size)
     |> Enum.flat_map(fn ids ->
       existing_ids =
-        Sanity.stream(
+        stream(
           projection: "{ _id }",
           query: "_id in $ids",
           request_opts: opts[:request_opts],
           variables: %{ids: ids}
         )
-        |> Enum.map(&Map.fetch!(&1, "_id"))
+        |> Enum.map(& &1._id)
 
       ids -- existing_ids
     end)

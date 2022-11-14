@@ -5,6 +5,7 @@ defmodule Sanity.SyncTest do
   import Mox
   setup :verify_on_exit!
 
+  import ExUnit.CaptureLog
   alias Sanity.Sync.{MockCallback, MockClient}
 
   @id "6d30d4be-e90d-4738-80b2-0d57873cf4fc"
@@ -19,8 +20,8 @@ defmodule Sanity.SyncTest do
     title: "Test Page"
   }
 
-  defp doc_fixture do
-    assert %Sanity.Sync.Doc{id: @id} = Sanity.Sync.upsert_sanity_doc!(@sanity_doc)
+  defp doc_fixture(doc_attrs \\ %{}) do
+    assert %Sanity.Sync.Doc{} = Sanity.Sync.upsert_sanity_doc!(Map.merge(@sanity_doc, doc_attrs))
   end
 
   test "get_doc" do
@@ -38,6 +39,28 @@ defmodule Sanity.SyncTest do
 
   test "get_doc! not found" do
     assert_raise Ecto.NoResultsError, fn -> Sanity.Sync.get_doc!("abd-def") end
+  end
+
+  test "reconcile_deleted" do
+    doc_fixture()
+    doc_fixture(%{_id: "other"})
+
+    Sanity.Sync.get_doc!(@id)
+    Sanity.Sync.get_doc!("other")
+
+    Mox.expect(MockClient, :stream, fn _opts ->
+      [%{"_id" => @id}]
+    end)
+
+    log =
+      capture_log([level: :warn], fn ->
+        Sanity.Sync.reconcile_deleted(request_opts: [project_id: "a"])
+      end)
+
+    assert log =~ ~S'deleting 1 records: ["other"]'
+
+    Sanity.Sync.get_doc!(@id)
+    assert Sanity.Sync.get_doc("other") == nil
   end
 
   test "sync" do
