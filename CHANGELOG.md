@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Sanity.Sync.reconcile_deleted/1` (https://github.com/balexand/sanity_sync/pull/10)
 
 ### Changed
-- don't call `unsafe_atomize_keys` twice in `sync/2``
+- don't call `unsafe_atomize_keys` twice in `sync/2`
 
 
 ## [0.3.0] - 2022-10-24
