@@ -6,17 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.0] - 2022-10-24
+## [0.4.0] - 2022-11-14
+### Added
+- `Sanity.Sync.reconcile_deleted/1` (https://github.com/balexand/sanity_sync/pull/10)
 
 ### Changed
+- don't call `unsafe_atomize_keys` twice in `sync/2``
 
+
+## [0.3.0] - 2022-10-24
+### Changed
 - Use `Sanity.stream/1` under the hood for efficient pagination of large datasets, automatic retry of failed requests, and cleaner code.
 - Stricter option validation using `nimble_options`.
 - `sync_all` requires `types` option.
 - Rename `sanity_config` option to `request_opts` for consistency with `Sanity.stream/1`.
 
 ## [0.2.1] - 2022-10-23
-
 ### Changed
-
 - Relax version requirement for `sanity` package.
