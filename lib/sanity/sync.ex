@@ -45,6 +45,58 @@ defmodule Sanity.Sync do
     repo().get!(Doc, id).doc |> unsafe_atomize_keys()
   end
 
+  @reconcile_deleted_opts_schema [
+    @request_opts_opt_schema,
+    batch_size: [
+      type: :pos_integer,
+      default: 500,
+      doc: "Number of records to fetch per batch."
+    ]
+  ]
+
+  @doc """
+  FIXME
+
+  ## Options
+
+  #{NimbleOptions.docs(@reconcile_deleted_opts_schema)}
+  """
+  def reconcile_deleted(opts) do
+    opts = NimbleOptions.validate!(opts, @reconcile_deleted_opts_schema)
+    batch_size = opts[:batch_size]
+
+    stream_ecto_ids(batch_size)
+    |> Stream.chunk_every(batch_size)
+    |> Stream.each(fn _ids ->
+      nil
+    end)
+    |> Stream.run()
+  end
+
+  # Returns a lazy stream of all `Sanity.Sync.Doc` ids in Ecto. Like `Ecto.Repo.stream` but
+  # doesn't keep a transaction open while enumerating.
+  defp stream_ecto_ids(batch_size) do
+    query =
+      from d in Doc,
+        select: d.id,
+        order_by: d.id,
+        limit: ^batch_size
+
+    Stream.unfold(:first_page, fn
+      nil ->
+        nil
+
+      :first_page ->
+        ids = repo().all(query)
+        {ids, List.last(ids)}
+
+      last_id ->
+        ids = repo().all(from d in query, where: d.id > ^last_id)
+        {ids, List.last(ids)}
+    end)
+    |> Stream.flat_map(& &1)
+  end
+
   @sync_opts_schema [
     @callback_opt_schema,
     @request_opts_opt_schema
