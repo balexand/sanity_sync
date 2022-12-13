@@ -44,7 +44,7 @@ defmodule Sanity.Sync.MixProject do
       {:jason, "~> 1.4"},
       {:nimble_options, "~> 0.4"},
       {:postgrex, ">= 0.0.0"},
-      {:sanity, "~> 0.12"},
+      {:sanity, "~> 0.12 or ~> 1.0"},
       {:unsafe_atomize_keys, "~> 1.1"},
 
       # Dev/test
