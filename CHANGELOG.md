@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2022-12-13
+### Changed
+- Relax version requirement for `:sanity` dep.
+
 ## [0.4.0] - 2022-11-14
 ### Added
 - `Sanity.Sync.reconcile_deleted/1` (https://github.com/balexand/sanity_sync/pull/10)
