@@ -50,7 +50,7 @@ defmodule Sanity.Sync do
     @request_opts_opt_schema,
     batch_size: [
       type: :pos_integer,
-      default: 500,
+      default: 200,
       doc: "Number of records to fetch per batch."
     ]
   ]
