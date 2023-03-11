@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2023-03-11
+### Changed
+- Relax `nimble_options` version requirement
+
 ## [0.5.0] - 2023-01-11
 ### Changed
 - Reduce default batch size for `reconcile_deleted` since the old batch size would result in Sanity "414 Request-URI Too Large" errors.
