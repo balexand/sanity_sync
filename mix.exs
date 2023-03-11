@@ -42,7 +42,7 @@ defmodule Sanity.Sync.MixProject do
       {:ecto_sql, "~> 3.0"},
       {:inflex, "~> 2.1"},
       {:jason, "~> 1.4"},
-      {:nimble_options, "~> 0.4"},
+      {:nimble_options, "~> 0.4 or ~> 1.0"},
       {:postgrex, ">= 0.0.0"},
       {:sanity, "~> 0.12 or ~> 1.0"},
       {:unsafe_atomize_keys, "~> 1.1"},
