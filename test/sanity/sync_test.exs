@@ -53,7 +53,7 @@ defmodule Sanity.SyncTest do
     end)
 
     log =
-      capture_log([level: :warn], fn ->
+      capture_log([level: :warning], fn ->
         Sanity.Sync.reconcile_deleted(request_opts: [project_id: "a"])
       end)
 

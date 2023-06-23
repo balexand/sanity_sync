@@ -86,7 +86,7 @@ defmodule Sanity.Sync do
         nil
 
       ids ->
-        Logger.warn("deleting #{length(ids)} records: #{inspect(ids, limit: :infinity)}")
+        Logger.warning("deleting #{length(ids)} records: #{inspect(ids, limit: :infinity)}")
         repo().delete_all(from d in Doc, where: d.id in ^ids)
     end
   end

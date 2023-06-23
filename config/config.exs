@@ -1,7 +1,7 @@
 import Config
 
 if config_env() == :test do
-  config :logger, level: :warn
+  config :logger, level: :warning
 
   config :sanity_sync, ecto_repos: [Sanity.Sync.Test.Repo]
 
